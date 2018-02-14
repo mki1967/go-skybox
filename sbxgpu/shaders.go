@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-
 // from https://github.com/go-gl/examples/blob/master/gl41core-cube/cube.go
 func compileShader(source string, shaderType uint32) (uint32, error) {
 	shader := gl.CreateShader(shaderType)
