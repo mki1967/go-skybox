@@ -2,9 +2,6 @@ package sbxgpu
 
 import (
 	"github.com/go-gl/gl/v3.3-core/gl"
-	// "math"
-	// "math/rand"
-	// "strconv"
 )
 
 /* texture parameters */
@@ -104,8 +101,14 @@ func sbx_renderRandomCube() {
 		// console.log(gl); // test
 
 		gl.UniformMatrix3fv(sbx_xyzLocation, 1 /* count */, false, &sbx_xyzArray[i][0])
+
+		/* // replaced with gl.BindVertexArray(sbx_renderTextureVAO )
 		gl.EnableVertexAttribArray(uint32(sbx_hLocation))
 		gl.BindBuffer(gl.ARRAY_BUFFER, sbx_hBufferId)
+		*/
+
+		gl.BindVertexArray(sbx_renderTextureVAO)
+
 		for j := 0; j < sbx_CUBE_SIZE+4; j++ {
 			gl.Uniform1f(sbx_vLocation, float32(j-2))
 			gl.VertexAttribPointer(uint32(sbx_hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))

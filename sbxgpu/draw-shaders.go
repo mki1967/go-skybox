@@ -2,35 +2,34 @@ package sbxgpu
 
 import (
 	"github.com/go-gl/gl/v3.3-core/gl"
-	// "math"
-	// "math/rand"
-	// "strconv"
 )
 
 /* shaders - see: http://learnopengl.com/#!Advanced-OpenGL/Cubemaps */
 
-var sbx_vertexShaderSource = "" +
-	"attribute vec3 position;\n" +
-	"varying vec3 TexCoords;\n" +
-	"uniform mat4 projection;\n" +
-	"uniform mat4 view;\n" +
-	"void main()\n" +
-	"{\n" +
-	"    vec4 pos = projection * view * vec4(position, 1.0);\n" +
-	"    gl_Position = pos.xyww;\n" +
-	//    "    gl_Position = vec4(pos.xy, 1.0,1.0);\n"+
-	"    TexCoords = position;\n" +
-	"}\n"
+var sbx_vertexShaderSource = `
+#version 330
+in vec3 position;
+out vec3 TexCoords;
+uniform mat4 projection;
+uniform mat4 view;
+void main()
+{
+    vec4 pos = projection * view * vec4(position, 1.0);
+    gl_Position = pos.xyww;
+    TexCoords = position;
+}
+` + "\x00"
 
-var sbx_fragmentShaderSource = "" +
-	"precision mediump float;\n" +
-	"varying vec3 TexCoords;\n" +
-	"uniform samplerCube skybox;\n" +
-	"void main()\n" +
-	"{\n" +
-	"    gl_FragColor = textureCube(skybox, TexCoords);\n" +
-	//    "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"+
-	"}\n"
+var sbx_fragmentShaderSource = `
+#version 330
+in vec3 TexCoords;
+out vec4 gl_FragColor
+uniform samplerCube skybox;
+void main()
+{
+    gl_FragColor = textureCube(skybox, TexCoords);
+}
+` + "\x00"
 
 /* shaders */
 var sbx_vertexShader uint32
@@ -38,6 +37,9 @@ var sbx_fragmentShader uint32
 
 /* shader program */
 var sbx_shaderProgram uint32
+
+/* VAO */
+var sbx_VAO uint32
 
 /* vertex attributes locations */
 var sbx_position int32
@@ -94,7 +96,6 @@ func sbx_makeShaderProgram() {
 	   gl - WebGL context
 	*/
 
-	// sbx_shaderProgram= sbx_makeShaderProgramTool(gl,  sbx_vertexShaderSource,  sbx_fragmentShaderSource);
 	sbx_shaderProgram, err := newProgram(sbx_vertexShaderSource, sbx_fragmentShaderSource)
 
 	if err != nil {
@@ -112,13 +113,17 @@ func sbx_makeShaderProgram() {
 	sbx_skybox = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("skybox\x00"))
 
 	/* load buffer data */
-	// sbx_arrayBuffer= gl.CreateBuffer();
 	gl.GenBuffers(1, &sbx_arrayBuffer)
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_arrayBuffer)
-	// gl.BufferData(gl.ARRAY_BUFFER, sbx_Float32Array , gl.STATIC_DRAW );
 	gl.BufferData(gl.ARRAY_BUFFER, len(sbx_Float32Array)*4 /* 4 bytes per flat32 */, gl.Ptr(sbx_Float32Array), gl.STATIC_DRAW)
 
-	// SUCCESS
-	// return sbx_shaderProgram;
+	/* init VAO */
+	gl.GenVertexArrays(1, &sbx_VAO)
+	gl.BindVertexArray(sbx_VAO)
+	gl.EnableVertexAttribArray(uint32(sbx_position))
+	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_arrayBuffer)
+	gl.VertexAttribPointer(uint32(sbx_position), 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
+	gl.BindVertexArray(0) // unbind VAO
+
 }
