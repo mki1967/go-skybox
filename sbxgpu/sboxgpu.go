@@ -8,6 +8,12 @@ import (
 // "strconv"
 )
 
-type SboxGpu struct {
+type SbxGpu struct {
+	/* shader program for drawing the skybox */
 	shaderProgram uint32
+	/* vertex attributes locations */
+	position int32
+	VAO      uint32
+
+	renderTextureVAO uint32
 }

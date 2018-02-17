@@ -5,7 +5,7 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-func sbx_drawSkybox(view, projection mgl32.Mat4) {
+func (sbx *SbxGpu) drawSkybox(view, projection mgl32.Mat4) {
 	/* use after drawing the scene */
 	/* Parameters:
 	   gl - WebGL context

@@ -52,12 +52,9 @@ var sbx_xyzArray = [6][9]float32{
 
 /* rendering random skybox in a frame */
 func sbx_renderRandomCube() {
-	// var i,j;
+
 	var defaultFBO int32
 	gl.GetIntegerv(gl.FRAMEBUFFER_BINDING, &defaultFBO)
-
-	// var hth= gl.ViewportHeight;
-	// 	var wth=  gl.ViewportWidth;
 
 	var viewport [4]int32
 	gl.GetIntegerv(gl.VIEWPORT, &viewport[0]) // save viewport parameters
