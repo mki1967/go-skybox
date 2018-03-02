@@ -31,10 +31,6 @@ void main()
 }
 ` + "\x00"
 
-/* shaders */
-var sbx_vertexShader uint32
-var sbx_fragmentShader uint32
-
 /* shader program */
 var sbx_shaderProgram uint32
 
@@ -45,9 +41,9 @@ var sbx_VAO uint32
 // var sbx_position int32
 
 /* uniform variables locations */
-var sbx_projection int32
-var sbx_view int32
-var sbx_skybox int32
+// var sbx_projection int32
+// var sbx_view int32
+// var sbx_skybox int32
 
 /* input vertices of cube triangles */
 var sbx_Float32Array = [...]float32{
@@ -91,7 +87,7 @@ var sbx_Float32Array = [...]float32{
 
 var sbx_arrayBuffer uint32
 
-func (sbx *SbxGpu) makeShaderProgram() {
+func (sbx *sbxGpu) makeShaderProgram() {
 	/* Parameters:
 	   gl - WebGL context
 	*/
@@ -108,9 +104,9 @@ func (sbx *SbxGpu) makeShaderProgram() {
 	sbx.position = gl.GetAttribLocation(sbx_shaderProgram, gl.Str("position\x00"))
 
 	/* set uniform variables locations */
-	sbx_projection = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("projection\x00"))
-	sbx_view = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("view\x00"))
-	sbx_skybox = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("skybox\x00"))
+	sbx.projection = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("projection\x00"))
+	sbx.view = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("view\x00"))
+	sbx.skybox = gl.GetUniformLocation(sbx_shaderProgram, gl.Str("skybox\x00"))
 
 	/* load buffer data */
 	gl.GenBuffers(1, &sbx_arrayBuffer)
@@ -119,12 +115,12 @@ func (sbx *SbxGpu) makeShaderProgram() {
 	gl.BufferData(gl.ARRAY_BUFFER, len(sbx_Float32Array)*4 /* 4 bytes per flat32 */, gl.Ptr(sbx_Float32Array), gl.STATIC_DRAW)
 
 	/* init VAO */
-	gl.GenVertexArrays(1, &sbx.VAO)
-	gl.BindVertexArray(sbx.VAO)
+	gl.GenVertexArrays(1, &sbx.vao)
+	gl.BindVertexArray(sbx.vao)
 	gl.EnableVertexAttribArray(uint32(sbx.position))
 	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_arrayBuffer)
 	gl.VertexAttribPointer(uint32(sbx.position), 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
-	gl.BindVertexArray(0) // unbind VAO
+	gl.BindVertexArray(0) // unbind vao
 	sbx.shaderProgram = sbx_shaderProgram
 
 }

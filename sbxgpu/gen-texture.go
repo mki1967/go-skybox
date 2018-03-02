@@ -4,14 +4,6 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
-/* texture parameters */
-var sbx_textureId uint32
-var sbx_textureIdExists = false
-var sbx_textureUnit uint32 = 0 // default
-// var sbx_textureSize=1024;
-var sbx_frameBufferId uint32
-var sbx_frameBufferIdExists = false
-
 /* arguments permutations */
 var sbx_xyzXPlus = [9]float32{
 	0, 0, -1,
@@ -50,8 +42,9 @@ var sbx_xyzArray = [6][9]float32{
 	sbx_xyzZMinus,
 }
 
-/* rendering random skybox in a frame */
-func sbx_renderRandomCube() {
+// RenderRandomCube creates new random skybox.
+// Use RenderRandomCube before using DrawSkybox.
+func (sbx *sbxGpu) RenderRandomCube() {
 
 	var defaultFBO int32
 	gl.GetIntegerv(gl.FRAMEBUFFER_BINDING, &defaultFBO)
@@ -59,13 +52,13 @@ func sbx_renderRandomCube() {
 	var viewport [4]int32
 	gl.GetIntegerv(gl.VIEWPORT, &viewport[0]) // save viewport parameters
 
-	if sbx_textureIdExists == false {
+	if sbx.textureIdExists == false {
 		/* create texture object and allocate image memories */
 		// sbx_textureId=gl.CreateTexture();
-		gl.GenTextures(1, &sbx_textureId)
-		sbx_textureIdExists = true
-		gl.ActiveTexture(gl.TEXTURE0 + sbx_textureUnit)
-		gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx_textureId)
+		gl.GenTextures(1, &sbx.textureId)
+		sbx.textureIdExists = true
+		gl.ActiveTexture(gl.TEXTURE0 + sbx.TextureUnit)
+		gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx.textureId)
 		for i := 0; i < 6; i++ {
 			gl.TexImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X+uint32(i), 0, gl.RGBA, sbx_CUBE_SIZE, sbx_CUBE_SIZE, 0, /* border */
 				gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(nil))
@@ -76,24 +69,24 @@ func sbx_renderRandomCube() {
 		gl.TexParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 	}
 
-	if sbx_frameBufferIdExists == false {
+	if sbx.frameBufferIdExists == false {
 		/* create framebuffer object */
 		// sbx_frameBufferId=gl.CreateFramebuffer();
-		gl.GenFramebuffers(1, &sbx_frameBufferId)
-		sbx_frameBufferIdExists = true
+		gl.GenFramebuffers(1, &sbx.frameBufferId)
+		sbx.frameBufferIdExists = true
 	}
 	gl.DeleteProgram(sbx_renderTextureShaderProgram) // delete old
 	sbx_makeRenderTextureShaderProgram()
 	gl.UseProgram(sbx_renderTextureShaderProgram)
 
-	gl.ActiveTexture(gl.TEXTURE0 + sbx_textureUnit)
-	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx_textureId)
+	gl.ActiveTexture(gl.TEXTURE0 + sbx.TextureUnit)
+	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx.textureId)
 
-	gl.BindFramebuffer(gl.FRAMEBUFFER, sbx_frameBufferId)
+	gl.BindFramebuffer(gl.FRAMEBUFFER, sbx.frameBufferId)
 	gl.Viewport(0, 0, sbx_CUBE_SIZE, sbx_CUBE_SIZE)
 
 	for i := 0; i < 6; i++ {
-		gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X+uint32(i), sbx_textureId, 0)
+		gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X+uint32(i), sbx.textureId, 0)
 		// console.log(gl.checkFramebufferStatus(gl.FRAMEBUFFER)); // test
 		// console.log(gl); // test
 
@@ -104,7 +97,7 @@ func sbx_renderRandomCube() {
 		gl.BindBuffer(gl.ARRAY_BUFFER, sbx_hBufferId)
 		*/
 
-		gl.BindVertexArray(sbx_renderTextureVAO)
+		gl.BindVertexArray(sbx.renderTextureVAO)
 
 		for j := 0; j < sbx_CUBE_SIZE+4; j++ {
 			gl.Uniform1f(sbx_vLocation, float32(j-2))
@@ -114,9 +107,7 @@ func sbx_renderRandomCube() {
 	}
 	gl.GenerateMipmap(gl.TEXTURE_CUBE_MAP)
 
-	gl.BindFramebuffer(gl.FRAMEBUFFER, uint32(defaultFBO)) // return to default screen FBO
-	//gl.ViewportWidth = wth;
-	// gl.ViewportHeight = hth;
+	gl.BindFramebuffer(gl.FRAMEBUFFER, uint32(defaultFBO))          // return to default screen FBO
 	gl.Viewport(viewport[0], viewport[1], viewport[2], viewport[3]) // restore viewport
 
 }

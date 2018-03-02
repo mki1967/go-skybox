@@ -5,13 +5,15 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-func (sbx *SbxGpu) drawSkybox(view, projection mgl32.Mat4) {
-	/* use after drawing the scene */
-	/* Parameters:
-	   gl - WebGL context
-	   view, projection - gl matrices 4x4 (column major)
-	   textureUnit - integer from [0 ... gl.MAX_TEXTURE_IMAGE_UNITS]
-	*/
+// DrawSkybox draws the generated skybox in the background.
+// Use DrawSkybox after drawing the scene.
+//
+// Parameters:
+//
+// view, projection - gl matrices 4x4 (column major)
+//
+// textureUnit - integer from [0 ... gl.MAX_TEXTURE_IMAGE_UNITS]
+func (sbx *sbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
 
 	var depthTest bool // previous depth test
 	gl.GetBooleanv(gl.DEPTH_TEST, &depthTest)
@@ -22,27 +24,22 @@ func (sbx *SbxGpu) drawSkybox(view, projection mgl32.Mat4) {
 
 	gl.UseProgram(sbx_shaderProgram)
 
-	gl.UniformMatrix4fv(sbx_view, 1, false, &(view[0]))
-	gl.UniformMatrix4fv(sbx_projection, 1, false, &(projection[0]))
+	gl.UniformMatrix4fv(sbx.view, 1, false, &(view[0]))
+	gl.UniformMatrix4fv(sbx.projection, 1, false, &(projection[0]))
 
-	gl.BindVertexArray(sbx_VAO)
-	/*  // instructions below replaced by gl.BindVertexArray( sbx_VAO)
-	gl.EnableVertexAttribArray(uint32(sbx_position))
-	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_arrayBuffer)
-	gl.VertexAttribPointer(uint32(sbx_position), 3, gl.FLOAT, false, 0, gl.PtrOffset(0))
-	*/
+	gl.BindVertexArray(sbx.vao)
 
-	gl.ActiveTexture(gl.TEXTURE0 + sbx_textureUnit)
-	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx_textureId)
-	gl.Uniform1i(sbx_skybox, int32(sbx_textureUnit))
-	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx_textureId)
+	gl.ActiveTexture(gl.TEXTURE0 + sbx.TextureUnit)
+	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx.textureId)
+	gl.Uniform1i(sbx.skybox, int32(sbx.TextureUnit))
+	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx.textureId)
 
 	//  gl.drawArrays(gl.TRIANGLES, 0, sbx_Float32Array.length/3 );
 	gl.DrawArrays(gl.TRIANGLES, 0, 36)
-	// gl.DepthFunc(gl.LESS)
 	gl.DepthFunc(uint32(depthFunc))
 	if !depthTest {
 		gl.Disable(gl.DEPTH_TEST)
 	}
+	gl.BindVertexArray(0) // unbind vao
 
 }
