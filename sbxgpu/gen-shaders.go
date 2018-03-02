@@ -14,7 +14,7 @@ var sbx_srcPI = "const float PI = " + strconv.FormatFloat(math.Pi, 'f', -1, 64) 
 var sbx_srcFunRPrefix = "float fR(float x,float y,float z){ return "
 var sbx_srcFunGPrefix = "float fG(float x,float y,float z){ return "
 var sbx_srcFunBPrefix = "float fB(float x,float y,float z){ return "
-var sbr_srcFunSuffix = "; }\n"
+var sbx_srcFunSuffix = "; }\n"
 
 // collection of color intensity functions
 var sbx_srcFunStrings = [...]string{
@@ -93,9 +93,9 @@ func sbx_makeRenderTextureShaderProgram() {
 	var g = rand.Intn(len(fun))
 	var b = rand.Intn(len(fun))
 
-	var sbx_srcFunR = sbx_srcFunRPrefix + sbx_srcFunStrings[r] + sbr_srcFunSuffix
-	var sbx_srcFunG = sbx_srcFunGPrefix + sbx_srcFunStrings[g] + sbr_srcFunSuffix
-	var sbx_srcFunB = sbx_srcFunBPrefix + sbx_srcFunStrings[b] + sbr_srcFunSuffix
+	var sbx_srcFunR = sbx_srcFunRPrefix + sbx_srcFunStrings[r] + sbx_srcFunSuffix
+	var sbx_srcFunG = sbx_srcFunGPrefix + sbx_srcFunStrings[g] + sbx_srcFunSuffix
+	var sbx_srcFunB = sbx_srcFunBPrefix + sbx_srcFunStrings[b] + sbx_srcFunSuffix
 
 	sbx_renderTextureVS = "#version 330\n\n" +
 		sbx_srcCubeSize +
