@@ -8,7 +8,7 @@ import (
 
 var sbx_vertexShaderSource = `
 #version 330
-in vec3 position;
+layout (location = 0) in vec3 position;
 out vec3 TexCoords;
 uniform mat4 projection;
 uniform mat4 view;
@@ -30,20 +30,6 @@ void main()
     gl_FragColor = textureCube(skybox, TexCoords);
 }
 ` + "\x00"
-
-/* shader program */
-var sbx_shaderProgram uint32
-
-/* VAO */
-var sbx_VAO uint32
-
-/* vertex attributes locations */
-// var sbx_position int32
-
-/* uniform variables locations */
-// var sbx_projection int32
-// var sbx_view int32
-// var sbx_skybox int32
 
 /* input vertices of cube triangles */
 var sbx_Float32Array = [...]float32{
@@ -87,7 +73,7 @@ var sbx_Float32Array = [...]float32{
 
 var sbx_arrayBuffer uint32
 
-func (sbx *sbxGpu) makeShaderProgram() {
+func (sbx *SbxGpu) makeShaderProgram() {
 	/* Parameters:
 	   gl - WebGL context
 	*/

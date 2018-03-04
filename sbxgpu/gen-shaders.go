@@ -42,7 +42,7 @@ var sbx_srcFunStrings = [...]string{
 // prepend constant definitions fR, fG, fB
 var sbx_renderTextureVS2 = ` 
 
-in float h;
+layout (location = 0) in float h;
 uniform float v;
 const float depth=1.0;
 uniform mat3 xyz;
@@ -76,18 +76,10 @@ void main()
 }
 ` + "\x00"
 
-/* to be created by sbx_makeRenderTextureShaderProgram */
-var sbx_renderTextureVS string
-var sbx_renderTextureShaderProgram uint32
-var sbx_renderTextureVAO uint32
 var sbx_hBufferId uint32 // array: [0,1, ..., sbx_CUBE_SIZE-1]
 var sbx_hBufferIdExists = false
 
-var sbx_hLocation int32
-var sbx_vLocation int32
-var sbx_xyzLocation int32
-
-func sbx_makeRenderTextureShaderProgram() {
+func (sbx *SbxGpu) makeRenderTextureShaderProgram() {
 	var fun = sbx_srcFunStrings
 	var r = rand.Intn(len(fun))
 	var g = rand.Intn(len(fun))
@@ -97,7 +89,7 @@ func sbx_makeRenderTextureShaderProgram() {
 	var sbx_srcFunG = sbx_srcFunGPrefix + sbx_srcFunStrings[g] + sbx_srcFunSuffix
 	var sbx_srcFunB = sbx_srcFunBPrefix + sbx_srcFunStrings[b] + sbx_srcFunSuffix
 
-	sbx_renderTextureVS = "#version 330\n\n" +
+	sbx_renderTextureVS := "#version 330\n\n" +
 		sbx_srcCubeSize +
 		sbx_srcPI +
 		sbx_srcFunR +
@@ -105,8 +97,8 @@ func sbx_makeRenderTextureShaderProgram() {
 		sbx_srcFunB +
 		sbx_renderTextureVS2
 
-	gl.DeleteVertexArrays(1, &sbx_renderTextureVAO)  // delete old VAO
-	gl.DeleteProgram(sbx_renderTextureShaderProgram) // delete old program if exists
+	gl.DeleteVertexArrays(1, &sbx.renderTextureVAO)  // delete old VAO
+	gl.DeleteProgram(sbx.renderTextureShaderProgram) // delete old program if exists
 
 	sbx_renderTextureShaderProgram, err := newProgram(sbx_renderTextureVS, sbx_renderTextureFS)
 
@@ -114,21 +106,23 @@ func sbx_makeRenderTextureShaderProgram() {
 		panic(err)
 	}
 
+	sbx.renderTextureShaderProgram = sbx_renderTextureShaderProgram // exists
+
 	/* set vertex attributes locations */
-	sbx_hLocation = gl.GetAttribLocation(sbx_renderTextureShaderProgram, gl.Str("h\x00"))
-	if sbx_hLocation < 0 {
-		panic("sbx_hLocation=" + strconv.Itoa(int(sbx_hLocation)))
+	sbx.hLocation = gl.GetAttribLocation(sbx.renderTextureShaderProgram, gl.Str("h\x00"))
+	if sbx.hLocation < 0 {
+		panic("sbx.hLocation=" + strconv.Itoa(int(sbx.hLocation)))
 	}
 
 	/* set uniform variables locations */
-	sbx_vLocation = gl.GetUniformLocation(sbx_renderTextureShaderProgram, gl.Str("v\x00"))
-	if sbx_vLocation < 0 {
-		panic("sbx_vLocation=" + strconv.Itoa(int(sbx_vLocation)))
+	sbx.vLocation = gl.GetUniformLocation(sbx.renderTextureShaderProgram, gl.Str("v\x00"))
+	if sbx.vLocation < 0 {
+		panic("sbx.vLocation=" + strconv.Itoa(int(sbx.vLocation)))
 	}
 
-	sbx_xyzLocation = gl.GetUniformLocation(sbx_renderTextureShaderProgram, gl.Str("xyz\x00"))
-	if sbx_xyzLocation < 0 {
-		panic("sbx_xyzLocation=" + strconv.Itoa(int(sbx_xyzLocation)))
+	sbx.xyzLocation = gl.GetUniformLocation(sbx.renderTextureShaderProgram, gl.Str("xyz\x00"))
+	if sbx.xyzLocation < 0 {
+		panic("sbx.xyzLocation=" + strconv.Itoa(int(sbx.xyzLocation)))
 	}
 
 	/* load buffer data */
@@ -140,16 +134,17 @@ func sbx_makeRenderTextureShaderProgram() {
 		for i := 0; i < sbx_CUBE_SIZE+4; i++ {
 			hIn[i] = float32(i - 2)
 		}
-		gl.BufferData(gl.ARRAY_BUFFER, len(hIn)*4 /* 4 bytes per flat32 */, gl.Ptr(hIn), gl.STATIC_DRAW)
+		gl.BufferData(gl.ARRAY_BUFFER, len(hIn)*4 /* 4 bytes per flat32 */, gl.Ptr(&hIn[0]), gl.STATIC_DRAW)
 		sbx_hBufferIdExists = true
 	}
 
 	/* init VAO */
-	gl.GenVertexArrays(1, &sbx_renderTextureVAO)
-	gl.BindVertexArray(sbx_renderTextureVAO)
+	gl.UseProgram(sbx.renderTextureShaderProgram)
+	gl.GenVertexArrays(1, &sbx.renderTextureVAO)
+	gl.BindVertexArray(sbx.renderTextureVAO)
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_hBufferId)
-	gl.EnableVertexAttribArray(uint32(sbx_hLocation))
-	gl.VertexAttribPointer(uint32(sbx_hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))
+	gl.EnableVertexAttribArray(uint32(sbx.hLocation))
+	gl.VertexAttribPointer(uint32(sbx.hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))
 	gl.BindVertexArray(0) // unbind VAO
 }

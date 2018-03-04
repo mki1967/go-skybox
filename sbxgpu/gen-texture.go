@@ -1,6 +1,7 @@
 package sbxgpu
 
 import (
+	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -44,7 +45,7 @@ var sbx_xyzArray = [6][9]float32{
 
 // RenderRandomCube creates new random skybox.
 // Use RenderRandomCube before using DrawSkybox.
-func (sbx *sbxGpu) RenderRandomCube() {
+func (sbx *SbxGpu) RenderRandomCube() {
 
 	var defaultFBO int32
 	gl.GetIntegerv(gl.FRAMEBUFFER_BINDING, &defaultFBO)
@@ -75,9 +76,9 @@ func (sbx *sbxGpu) RenderRandomCube() {
 		gl.GenFramebuffers(1, &sbx.frameBufferId)
 		sbx.frameBufferIdExists = true
 	}
-	gl.DeleteProgram(sbx_renderTextureShaderProgram) // delete old
-	sbx_makeRenderTextureShaderProgram()
-	gl.UseProgram(sbx_renderTextureShaderProgram)
+	gl.DeleteProgram(sbx.renderTextureShaderProgram) // delete old
+	sbx.makeRenderTextureShaderProgram()
+	gl.UseProgram(sbx.renderTextureShaderProgram)
 
 	gl.ActiveTexture(gl.TEXTURE0 + sbx.TextureUnit)
 	gl.BindTexture(gl.TEXTURE_CUBE_MAP, sbx.textureId)
@@ -87,23 +88,33 @@ func (sbx *sbxGpu) RenderRandomCube() {
 
 	for i := 0; i < 6; i++ {
 		gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X+uint32(i), sbx.textureId, 0)
-		// console.log(gl.checkFramebufferStatus(gl.FRAMEBUFFER)); // test
+		fmt.Println(gl.CheckFramebufferStatus(gl.FRAMEBUFFER)) // test
+		fmt.Println("?", gl.FRAMEBUFFER_COMPLETE)              // test
 		// console.log(gl); // test
 
-		gl.UniformMatrix3fv(sbx_xyzLocation, 1 /* count */, false, &sbx_xyzArray[i][0])
+		gl.UniformMatrix3fv(sbx.xyzLocation, 1 /* count */, false, &sbx_xyzArray[i][0])
 
-		/* // replaced with gl.BindVertexArray(sbx_renderTextureVAO )
-		gl.EnableVertexAttribArray(uint32(sbx_hLocation))
+		gl.PointSize(2) ///
+
+		// replaced with gl.BindVertexArray(sbx_renderTextureVAO )
+		gl.EnableVertexAttribArray(uint32(sbx.hLocation))
 		gl.BindBuffer(gl.ARRAY_BUFFER, sbx_hBufferId)
-		*/
 
-		gl.BindVertexArray(sbx.renderTextureVAO)
+		// gl.BindVertexArray(sbx.renderTextureVAO)
 
 		for j := 0; j < sbx_CUBE_SIZE+4; j++ {
-			gl.Uniform1f(sbx_vLocation, float32(j-2))
-			gl.VertexAttribPointer(uint32(sbx_hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))
+			gl.Uniform1f(sbx.vLocation, float32(j-2))
+			gl.VertexAttribPointer(uint32(sbx.hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))
+			// gl.BindVertexArray(sbx.renderTextureVAO)
 			gl.DrawArrays(gl.POINTS, 0, sbx_CUBE_SIZE+4)
+			// gl.BindVertexArray(0) // unbind
+
 		}
+
+		/// tests
+		gl.ClearColor(1.0, 0.4, 0.4, 1.0)
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
 	}
 	gl.GenerateMipmap(gl.TEXTURE_CUBE_MAP)
 

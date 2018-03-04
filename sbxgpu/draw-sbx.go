@@ -13,7 +13,7 @@ import (
 // view, projection - gl matrices 4x4 (column major)
 //
 // textureUnit - integer from [0 ... gl.MAX_TEXTURE_IMAGE_UNITS]
-func (sbx *sbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
+func (sbx *SbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
 
 	var depthTest bool // previous depth test
 	gl.GetBooleanv(gl.DEPTH_TEST, &depthTest)
@@ -22,7 +22,7 @@ func (sbx *sbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
 	gl.GetIntegerv(gl.DEPTH_FUNC, &depthFunc)
 	gl.DepthFunc(gl.LEQUAL)
 
-	gl.UseProgram(sbx_shaderProgram)
+	gl.UseProgram(sbx.shaderProgram)
 
 	gl.UniformMatrix4fv(sbx.view, 1, false, &(view[0]))
 	gl.UniformMatrix4fv(sbx.projection, 1, false, &(projection[0]))

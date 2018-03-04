@@ -9,8 +9,8 @@ import (
 )
 
 // NewSbxGpu creates structure for handling  skybox
-func NewSbxGpu() sbxGpu {
-	sbx := sbxGpu{}
+func NewSbxGpu() SbxGpu {
+	sbx := SbxGpu{}
 
 	// initial values
 	sbx.textureIdExists = false
@@ -22,7 +22,7 @@ func NewSbxGpu() sbxGpu {
 	return sbx
 }
 
-type sbxGpu struct {
+type SbxGpu struct {
 	/* shader program for drawing the skybox */
 	shaderProgram uint32
 
@@ -40,6 +40,18 @@ type sbxGpu struct {
 
 	/* location of uniform samplerCube skybox */
 	skybox int32
+
+	/* id of the shader program for rendernig the texture walls */
+	renderTextureShaderProgram uint32
+
+	/* attribute location for sequence of points of horizontal line of a texture wall in rendering skybox */
+	hLocation int32
+
+	/* uniform location for vertical coordinate of the line */
+	vLocation int32
+
+	/* uniform location of the permutation for the wall */
+	xyzLocation int32
 
 	/*  vertex array object  for rendering new skybox */
 	renderTextureVAO uint32
