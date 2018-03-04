@@ -19,6 +19,8 @@ func NewSbxGpu() SbxGpu {
 	// default values of the public fields
 	sbx.TextureUnit = 0
 
+	sbx.makeShaderProgram()
+
 	return sbx
 }
 

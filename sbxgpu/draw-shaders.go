@@ -23,7 +23,7 @@ void main()
 var sbx_fragmentShaderSource = `
 #version 330
 in vec3 TexCoords;
-out vec4 gl_FragColor
+// out vec4 gl_FragColor;
 uniform samplerCube skybox;
 void main()
 {
@@ -98,7 +98,7 @@ func (sbx *SbxGpu) makeShaderProgram() {
 	gl.GenBuffers(1, &sbx_arrayBuffer)
 
 	gl.BindBuffer(gl.ARRAY_BUFFER, sbx_arrayBuffer)
-	gl.BufferData(gl.ARRAY_BUFFER, len(sbx_Float32Array)*4 /* 4 bytes per flat32 */, gl.Ptr(sbx_Float32Array), gl.STATIC_DRAW)
+	gl.BufferData(gl.ARRAY_BUFFER, len(sbx_Float32Array)*4 /* 4 bytes per flat32 */, gl.Ptr(&sbx_Float32Array[0]), gl.STATIC_DRAW)
 
 	/* init VAO */
 	gl.GenVertexArrays(1, &sbx.vao)
