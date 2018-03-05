@@ -8,7 +8,8 @@ import (
 // "strconv"
 )
 
-// NewSbxGpu creates structure for handling  skybox
+// NewSbxGpu creates structure for handling  skybox.
+// SbxGpu element must be created with NewSbxGpu since it makes its shader for drawing the skybox.
 func NewSbxGpu() SbxGpu {
 	sbx := SbxGpu{}
 
@@ -24,6 +25,7 @@ func NewSbxGpu() SbxGpu {
 	return sbx
 }
 
+// The structure for hadling the skybox.
 type SbxGpu struct {
 	/* shader program for drawing the skybox */
 	shaderProgram uint32
