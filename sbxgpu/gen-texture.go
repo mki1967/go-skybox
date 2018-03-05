@@ -56,7 +56,6 @@ func (sbx *SbxGpu) RenderRandomCube() {
 
 	if sbx.textureIdExists == false {
 		/* create texture object and allocate image memories */
-		// sbx_textureId=gl.CreateTexture();
 		gl.GenTextures(1, &sbx.textureId)
 		sbx.textureIdExists = true
 		gl.ActiveTexture(gl.TEXTURE0 + sbx.TextureUnit)
@@ -73,7 +72,6 @@ func (sbx *SbxGpu) RenderRandomCube() {
 
 	if sbx.frameBufferIdExists == false {
 		/* create framebuffer object */
-		// sbx_frameBufferId=gl.CreateFramebuffer();
 		gl.GenFramebuffers(1, &sbx.frameBufferId)
 		sbx.frameBufferIdExists = true
 	}
@@ -91,32 +89,17 @@ func (sbx *SbxGpu) RenderRandomCube() {
 		gl.FramebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X+uint32(i), sbx.textureId, 0)
 		// fmt.Println(gl.CheckFramebufferStatus(gl.FRAMEBUFFER)) // test
 		// fmt.Println("?", gl.FRAMEBUFFER_COMPLETE)              // test
-		// console.log(gl); // test
 
 		gl.UniformMatrix3fv(sbx.xyzLocation, 1 /* count */, false, &sbx_xyzArray[i][0])
-
-		gl.PointSize(2) ///
-
-		// replaced with gl.BindVertexArray(sbx_renderTextureVAO )
-		// gl.EnableVertexAttribArray(uint32(sbx.hLocation))
-		// gl.BindBuffer(gl.ARRAY_BUFFER, sbx_hBufferId)
 
 		gl.BindVertexArray(sbx.renderTextureVAO)
 
 		for j := 0; j < sbx_CUBE_SIZE+4; j++ {
 			gl.Uniform1f(sbx.vLocation, float32(j-2))
-			gl.VertexAttribPointer(uint32(sbx.hLocation), 1, gl.FLOAT, false, 0, gl.PtrOffset(0))
-			// gl.BindVertexArray(sbx.renderTextureVAO)
 			gl.DrawArrays(gl.POINTS, 0, sbx_CUBE_SIZE+4)
-			// gl.BindVertexArray(0) // unbind
-
 		}
 
 		gl.BindVertexArray(0) // unbind
-		/// tests
-		// gl.ClearColor(1.0, 0.4, 0.4, 1.0)
-		// gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
 	}
 	gl.GenerateMipmap(gl.TEXTURE_CUBE_MAP)
 

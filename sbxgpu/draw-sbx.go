@@ -38,10 +38,11 @@ func (sbx *SbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
 
 	//  gl.drawArrays(gl.TRIANGLES, 0, sbx_Float32Array.length/3 );
 	gl.DrawArrays(gl.TRIANGLES, 0, 36)
+	gl.BindVertexArray(0) // unbind vao
+
 	gl.DepthFunc(uint32(depthFunc))
 	if !depthTest {
 		gl.Disable(gl.DEPTH_TEST)
 	}
-	gl.BindVertexArray(0) // unbind vao
 
 }
