@@ -1,4 +1,4 @@
-# go-skybox
+# go-skybox [![Build Status](https://travis-ci.org/mki1967/go-skybox.svg?branch=master)](https://travis-ci.org/mki1967/go-skybox)
 go packages for skyboxes
 
 GoDoc links:
