@@ -12,8 +12,6 @@ import (
 //
 //  view, projection - gl matrices 4x4 (column major)
 //
-//  textureUnit - integer from [0 ... gl.MAX_TEXTURE_IMAGE_UNITS]
-//
 // Only the upper left 3x3 submatrix of view is used (the orientation of the observer).
 func (sbx *SbxGpu) DrawSkybox(view, projection mgl32.Mat4) {
 
