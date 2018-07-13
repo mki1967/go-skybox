@@ -69,10 +69,11 @@ var sbx_renderTextureFS = `
 #version 330
 
 in vec4 color;
+out vec4 out_FragColor;
 
 void main()
 {
-  gl_FragColor= color;
+  out_FragColor= color;
 }
 ` + "\x00"
 

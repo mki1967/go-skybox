@@ -22,12 +22,13 @@ void main()
 
 var sbx_fragmentShaderSource = `
 #version 330
+#extension GL_NV_shadow_samplers_cube : enable
 in vec3 TexCoords;
-// out vec4 gl_FragColor;
+out vec4 out_FragColor;
 uniform samplerCube skybox;
 void main()
 {
-    gl_FragColor = textureCube(skybox, TexCoords);
+    out_FragColor = textureCube(skybox, TexCoords);
 }
 ` + "\x00"
 
